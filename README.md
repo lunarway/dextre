@@ -24,7 +24,7 @@ In order to use `dextre`, you need:
 
 ### drain
 ```
-$ dextre drain --help
+$ dextre drain --help
 Usage:
   dextre drain [flags]
 
@@ -44,7 +44,7 @@ Global Flags:
 * (Optional) Terminate the instance in an aws scaling group for a new one to be spun up.
 
 ### restart
-```
+```
 $ dextre restart --help
 Usage:
   dextre restart [flags]
