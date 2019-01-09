@@ -3,6 +3,8 @@
 builds:
 - env:
   - CGO_ENABLED=0
+  ldflags:
+  - "-s -w -X github.com/lunarway/dextre/main.version={{.Version}} -X github.com/lunarway/dextre/main.commit={{.Commit}}"
   
 archive:
   format: binary
@@ -14,9 +16,14 @@ archive:
     386: i386
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: '{{ .ProjectName }}-checksums.txt'
+
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: "git-{{.Commit}}"
+
+release:
+  name_template: "v{{.Version}}"
+
 changelog:
   sort: asc
   filters:
