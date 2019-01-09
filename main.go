@@ -7,6 +7,11 @@ import (
 	"github.com/lunarway/dextre/cmd"
 )
 
+var (
+	version = "<dev-version>"
+	commit  = "<unspecified-commit>"
+)
+
 func main() {
 	command, err := cmd.NewCommand("dextre")
 	if err != nil {
