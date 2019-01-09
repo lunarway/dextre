@@ -45,7 +45,7 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	ui.PrintPodList(systemPods, "System pods to be evicted", false)
 	ui.PrintPodList(regularPods, "Regular pods to be evicted", true)
 
-	if skipValidation {
+	if !skipValidation {
 		fmt.Printf("Are you sure you want to evict all pods on the node? ")
 
 		ok, err := ui.AskForConfirmation()
@@ -80,7 +80,7 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	fmt.Println("")
 	color.Green("[✓] All pods evicted!\n")
 
-	if skipValidation {
+	if !skipValidation {
 		fmt.Println("")
 		fmt.Printf("Do you want to continue and terminate the node? ")
 		ok, err := ui.AskForConfirmation()
