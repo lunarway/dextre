@@ -13,7 +13,7 @@ import (
 )
 
 //Run: executes the drain command
-func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration) error {
+func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation bool) error {
 	// Output the banner
 	ui.PrintBanner("dextre")
 
@@ -45,16 +45,18 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration)
 	ui.PrintPodList(systemPods, "System pods to be evicted", false)
 	ui.PrintPodList(regularPods, "Regular pods to be evicted", true)
 
-	fmt.Printf("Are you sure you want to evict all pods on the node? ")
+	if skipValidation {
+		fmt.Printf("Are you sure you want to evict all pods on the node? ")
 
-	ok, err := ui.AskForConfirmation()
-	if err != nil {
-		return err
-	}
+		ok, err := ui.AskForConfirmation()
+		if err != nil {
+			return err
+		}
 
-	if !ok {
-		// return nil to exit nicely
-		return nil
+		if !ok {
+			// return nil to exit nicely
+			return nil
+		}
 	}
 
 	// Cordon the node for in order to not get more pods scheduled
@@ -78,16 +80,18 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration)
 	fmt.Println("")
 	color.Green("[✓] All pods evicted!\n")
 
-	fmt.Println("")
-	fmt.Printf("Do you want to continue and terminate the node? ")
-	ok, err = ui.AskForConfirmation()
-	if err != nil {
-		return err
-	}
+	if skipValidation {
+		fmt.Println("")
+		fmt.Printf("Do you want to continue and terminate the node? ")
+		ok, err := ui.AskForConfirmation()
+		if err != nil {
+			return err
+		}
 
-	// user stopped the flow
-	if !ok {
-		return nil
+		// user stopped the flow
+		if !ok {
+			return nil
+		}
 	}
 
 	fmt.Println("")
