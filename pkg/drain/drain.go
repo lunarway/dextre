@@ -14,8 +14,6 @@ import (
 
 //Run: executes the drain command
 func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation bool) error {
-	// Output the banner
-	ui.PrintBanner("dextre")
 
 	// Find the node in the cluster
 	node, err := kubectl.GetNode(nodeName)

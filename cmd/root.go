@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/CrowdSurge/banner"
 	"github.com/lunarway/dextre/cmd/drain"
-	"github.com/lunarway/dextre/cmd/restart"
+	"github.com/lunarway/dextre/cmd/roll"
 	"github.com/lunarway/dextre/pkg/kubernetes"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,7 @@ func NewCommand(name string) (*cobra.Command, error) {
 
 	c.AddCommand(
 		drain.NewCommand(kubectl),
-		restart.NewCommand(kubectl),
+		roll.NewCommand(kubectl),
 	)
 	return c, nil
 }

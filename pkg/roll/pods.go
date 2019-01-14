@@ -1,4 +1,4 @@
-package restart
+package roll
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 )
 
 //Run: executes the drain command
-func Run(kubectl *kubernetes.Client, label string, namespace string, gracePeriod time.Duration) error {
+func Pods(kubectl *kubernetes.Client, label string, namespace string, gracePeriod time.Duration) error {
 	// Output the banner
 	ui.PrintBanner("dextre")
 

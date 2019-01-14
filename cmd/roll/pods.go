@@ -1,10 +1,10 @@
-package restart
+package roll
 
 import (
 	"time"
 
 	"github.com/lunarway/dextre/pkg/kubernetes"
-	"github.com/lunarway/dextre/pkg/restart"
+	"github.com/lunarway/dextre/pkg/roll"
 	"github.com/spf13/cobra"
 )
 
@@ -15,13 +15,13 @@ var (
 )
 
 // NewCommand sets up the move command
-func NewCommand(kubectl *kubernetes.Client) *cobra.Command {
+func podsCommand(kubectl *kubernetes.Client) *cobra.Command {
 	c := &cobra.Command{
-		Use:   "restart",
+		Use:   "pods",
 		Short: "",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return restart.Run(kubectl, label, namespace, gracePeriod)
+			return roll.Pods(kubectl, label, namespace, gracePeriod)
 		},
 	}
 	c.Flags().StringVar(&label, "label", "", "The labels that should be restarted on the form: type=service")
