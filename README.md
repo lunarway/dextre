@@ -1,5 +1,8 @@
 # dextre
 
+[![Build Status](https://travis-ci.com/lunarway/dextre.svg?branch=master)](https://travis-ci.com/lunarway/dextre)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lunarway/dextre)](https://goreportcard.com/report/github.com/lunarway/dextre)
+
 ## Table of contents
 - [What is dextre?](#what-is-dextre)
 - [Why did we build dextre?](#why-did-we-build-dextre)
