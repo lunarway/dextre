@@ -7,21 +7,23 @@ import (
 )
 
 // NewCommand sets up the move command
-func nodesCommand(kubectl *kubernetes.Client) *cobra.Command {
-	var role string
-	var label string
+func nodesCommand(kubectl *kubernetes.Client, verbose *bool) *cobra.Command {
+	var instanceGroup string
+	var cluster string
 
 	c := &cobra.Command{
 		Use:   "nodes",
 		Short: "",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return roll.Nodes(kubectl, role, label)
+			return roll.Nodes(kubectl, instanceGroup, cluster, *verbose)
 		},
 	}
-	c.Flags().StringVar(&role, "role", "", "Role type of the nodes to be rolled")
-	c.MarkFlagRequired("role")
+	c.Flags().StringVar(&instanceGroup, "kops-instance-group", "", "kops instance group to perfrom the rolling on")
+	c.MarkFlagRequired("kops-instance-group")
 	c.Flags().StringVar(&label, "label", "", "label of the nodes to be rolled")
+	c.Flags().StringVar(&cluster, "cluster", "", "the name of the kops cluster")
+	c.MarkFlagRequired("cluster")
 
 	return c
 }

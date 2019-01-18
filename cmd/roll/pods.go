@@ -15,13 +15,13 @@ var (
 )
 
 // NewCommand sets up the move command
-func podsCommand(kubectl *kubernetes.Client) *cobra.Command {
+func podsCommand(kubectl *kubernetes.Client, verbose *bool) *cobra.Command {
 	c := &cobra.Command{
 		Use:   "pods",
 		Short: "",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return roll.Pods(kubectl, label, namespace, gracePeriod)
+			return roll.Pods(kubectl, label, namespace, gracePeriod, *verbose)
 		},
 	}
 	c.Flags().StringVar(&label, "label", "", "The labels that should be restarted on the form: type=service")
