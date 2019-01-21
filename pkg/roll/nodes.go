@@ -50,6 +50,7 @@ func Nodes(kubectl *kubernetes.Client, instanceGroup, cluster string, verbose bo
 	}
 
 	for _, node := range rollableNodes {
+		spinner.Start()
 		ui.PrintTitle(fmt.Sprintf("[-] %s:",node.Name),true)
 
 		// Get the list of current nodes in the cluster

@@ -7,9 +7,8 @@ import (
 	dextreaws "github.com/lunarway/dextre/pkg/aws"
 	"github.com/lunarway/dextre/pkg/kubernetes"
 	"github.com/lunarway/dextre/pkg/ui"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 )
 
 //Run: executes the drain command
@@ -40,9 +39,8 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	}
 
 	// Print the pods to be evicted; both system and regular
-	ui.PrintPodList(systemPods, "System pods to be evicted", false,verbose)
+	ui.PrintPodList(systemPods, "System pods to be evicted", false, verbose)
 	ui.PrintPodList(regularPods, "Regular pods to be evicted", true, verbose)
-
 
 	if !skipValidation {
 		fmt.Printf("Are you sure you want to evict all pods on the node? ")
@@ -76,49 +74,51 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	rollPods(kubectl, systemPods, gracePeriod, verbose)
 
 	ui.Print("", verbose)
-	ui.Print(fmt.Sprintf("[✓] %d pods evicted!",len(systemPods)+len(regularPods)), true)
+	ui.Print(fmt.Sprintf("[✓] %d pods evicted!", len(systemPods)+len(regularPods)), true)
 
-	if nodeTermination {
-		if !skipValidation {
-			fmt.Println("")
-			fmt.Printf("Do you want to continue and terminate the node? ")
-			ok, err := ui.AskForConfirmation()
-			if err != nil {
-				return err
-			}
+	if !nodeTermination {
+		retun nil
+	}
 	
-			// user stopped the flow
-			if !ok {
-				return nil
-			}
-		}
-	
-		ui.Print("",verbose)
-		ui.PrintTitle("Node termination:\n",verbose)
-	
-		// Create the client
-		client, err := dextreaws.NewClient("eu-west-1")
-	
+	if !skipValidation {
+		fmt.Println("")
+		fmt.Printf("Do you want to continue and terminate the node? ")
+		ok, err := ui.AskForConfirmation()
 		if err != nil {
 			return err
 		}
-	
-		instanceID, err := client.GetInstanceId(nodeName)
-		if err != nil {
-			return err
+
+		// user stopped the flow
+		if !ok {
+			return nil
 		}
-	
-		ui.Print(fmt.Sprintf("%-25s %s", "Private DNS:", nodeName),verbose)
-		ui.Print(fmt.Sprintf("%-25s %s", "Instance ID:", instanceID),verbose)
-	
-		err = client.TerminateInstanceKeepDesiredCapacity(instanceID)
-		if err != nil {
-			return err
-		}
-	
-		ui.Print("\n", verbose)
-		ui.Print("[✓] Node has been terminated!\n", true)
-	} 
+	}
+
+	ui.Print("", verbose)
+	ui.PrintTitle("Node termination:\n", verbose)
+
+	// Create the client
+	client, err := dextreaws.NewClient("eu-west-1")
+
+	if err != nil {
+		return err
+	}
+
+	instanceID, err := client.GetInstanceId(nodeName)
+	if err != nil {
+		return err
+	}
+
+	ui.Print(fmt.Sprintf("%-25s %s", "Private DNS:", nodeName), verbose)
+	ui.Print(fmt.Sprintf("%-25s %s", "Instance ID:", instanceID), verbose)
+
+	err = client.TerminateInstanceKeepDesiredCapacity(instanceID)
+	if err != nil {
+		return err
+	}
+
+	ui.Print("\n", verbose)
+	ui.Print("[✓] Node has been terminated!\n", true)
 	return nil
 }
 

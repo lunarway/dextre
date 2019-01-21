@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 )
@@ -72,7 +74,7 @@ func (c *Client) GetAutoScalingGroup(instanceGroup, cluster string) (AutoScaling
 			}, nil
 		}
 	}
-	return AutoScalingGroupStruct{}, nil
+	return AutoScalingGroupStruct{}, errors.New("not found")
 }
 
 func (c *Client) IncrementCapacity(autoScalingGroup AutoScalingGroupStruct) error {

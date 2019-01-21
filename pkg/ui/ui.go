@@ -7,7 +7,7 @@ import (
 	"github.com/CrowdSurge/banner"
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 type Table struct {
@@ -82,17 +82,18 @@ func PrintBanner(title string) {
 }
 
 func PrintPodList(pods []v1.Pod, title string, namespace, verbose bool) {
-	if verbose {
-		color.Yellow(title + "\n")
-		for _, pod := range pods {
-			if namespace {
-				fmt.Printf("> %s (%s)\n", pod.Name, pod.Namespace)
-			} else {
-				fmt.Printf("> %s\n", pod.Name)
-			}
-		}
-		fmt.Println("")
+	if !verbose {
+		return
 	}
+	color.Yellow(title + "\n")
+	for _, pod := range pods {
+		if namespace {
+			fmt.Printf("> %s (%s)\n", pod.Name, pod.Namespace)
+		} else {
+			fmt.Printf("> %s\n", pod.Name)
+		}
+	}
+	fmt.Println("")
 }
 
 func AskForConfirmation() (bool, error) {
