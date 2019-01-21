@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fatih/color"
 	dextreaws "github.com/lunarway/dextre/pkg/aws"
 	"github.com/lunarway/dextre/pkg/kubernetes"
 	"github.com/lunarway/dextre/pkg/ui"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 //Run: executes the drain command
-func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation bool) error {
+func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation, nodeTermination, verbose bool) error {
 
 	// Find the node in the cluster
 	node, err := kubectl.GetNode(nodeName)
@@ -40,8 +39,8 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	}
 
 	// Print the pods to be evicted; both system and regular
-	ui.PrintPodList(systemPods, "System pods to be evicted", false)
-	ui.PrintPodList(regularPods, "Regular pods to be evicted", true)
+	ui.PrintPodList(systemPods, "System pods to be evicted", false, verbose)
+	ui.PrintPodList(regularPods, "Regular pods to be evicted", true, verbose)
 
 	if !skipValidation {
 		fmt.Printf("Are you sure you want to evict all pods on the node? ")
@@ -63,20 +62,23 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 		return err
 	}
 
-	fmt.Println("")
-	color.Yellow("Cordon\n")
-	fmt.Printf("[✓] %s cordoned\n\n", node.ObjectMeta.Name)
+	ui.Print("", verbose)
+	ui.PrintTitle("Cordon\n", verbose)
+	ui.Print(fmt.Sprintf("[✓] %s cordoned\n\n", node.ObjectMeta.Name), verbose)
 
-	// put this in UI as a header function
-	color.Yellow("Evict Regular pods")
-	rollPods(kubectl, regularPods, gracePeriod)
+	ui.PrintTitle("Evict Regular pods\n", verbose)
+	rollPods(kubectl, regularPods, gracePeriod, verbose)
 
-	fmt.Println("")
-	color.Yellow("Evict System pods")
-	rollPods(kubectl, systemPods, gracePeriod)
+	ui.Print("", verbose)
+	ui.PrintTitle("Evict System pods\n", verbose)
+	rollPods(kubectl, systemPods, gracePeriod, verbose)
 
-	fmt.Println("")
-	color.Green("[✓] All pods evicted!\n")
+	ui.Print("", verbose)
+	ui.Print(fmt.Sprintf("[✓] %d pods evicted!", len(systemPods)+len(regularPods)), true)
+
+	if !nodeTermination {
+		return nil
+	}
 
 	if !skipValidation {
 		fmt.Println("")
@@ -92,8 +94,8 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 		}
 	}
 
-	fmt.Println("")
-	color.Yellow("Node termination:\n")
+	ui.Print("", verbose)
+	ui.PrintTitle("Node termination:\n", verbose)
 
 	// Create the client
 	client, err := dextreaws.NewClient("eu-west-1")
@@ -107,22 +109,21 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 		return err
 	}
 
-	fmt.Printf("%-25s %s\n", "Private DNS:", nodeName)
-	fmt.Printf("%-25s %s\n", "Instance ID:", instanceID)
+	ui.Print(fmt.Sprintf("%-25s %s", "Private DNS:", nodeName), verbose)
+	ui.Print(fmt.Sprintf("%-25s %s", "Instance ID:", instanceID), verbose)
 
-	err = client.TerminateInstance(instanceID)
+	err = client.TerminateInstanceKeepDesiredCapacity(instanceID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("")
-	color.Green("[✓] Node has been terminated!\n")
-
+	ui.Print("\n", verbose)
+	ui.Print("[✓] Node has been terminated!\n", true)
 	return nil
 }
 
-func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration) error {
-	table := ui.NewTable("[-]", "EVICTED", "NEW", "NODE")
+func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration, verbose bool) error {
+	table := ui.NewTable("[-]", "EVICTED POD", "NEW POD", "NEW NODE", verbose)
 	graceP := int64(gracePeriod.Seconds())
 
 	// Evict regular pods first.
@@ -145,6 +146,7 @@ func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Durati
 			table.CommitRow("[✓]", pod.Name, newPod.Name, newPod.Spec.NodeName)
 		}
 		table.DiscardRow()
+
 	}
 	return nil
 }

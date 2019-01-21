@@ -20,8 +20,10 @@ func NewCommand(name string) (*cobra.Command, error) {
 	}
 
 	var kubeConfig string
+	var verbose bool
 	flags := c.PersistentFlags()
 	flags.StringVar(&kubeConfig, "kubeconfig", "", "kubeconfig file")
+	flags.BoolVar(&verbose, "verbose", false, "verbose output")
 
 	kubectl, err := kubernetes.NewClient(kubeConfig)
 	if err != nil {
@@ -29,8 +31,8 @@ func NewCommand(name string) (*cobra.Command, error) {
 	}
 
 	c.AddCommand(
-		drain.NewCommand(kubectl),
-		roll.NewCommand(kubectl),
+		drain.NewCommand(kubectl, &verbose),
+		roll.NewCommand(kubectl, &verbose),
 	)
 	return c, nil
 }

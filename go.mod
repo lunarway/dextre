@@ -18,6 +18,7 @@ require (
 	github.com/json-iterator/go v1.1.5
 	github.com/mattn/go-colorable v0.0.9
 	github.com/mattn/go-isatty v0.0.4
+	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
 	github.com/petar/GoLLRB v0.0.0-20130427215148-53be0d36a84c
@@ -32,6 +33,7 @@ require (
 	golang.org/x/text v0.3.0
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
 	google.golang.org/appengine v1.3.0
+	gopkg.in/cheggaaa/pb.v1 v1.0.27
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.2.2
 	k8s.io/api v0.0.0-20181130031204-d04500c8c3dd

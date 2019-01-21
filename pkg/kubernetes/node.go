@@ -1,7 +1,6 @@
 package kubernetes
 
 import (
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -83,7 +82,7 @@ func (c *Client) WaitForNodeToTerminate(node v1.Node) error {
 	return nil
 }
 
-func (c *Client) IdentifyNewNode(nodes []v1.Node, role, label string) (*v1.Node, error) {
+func (c *Client) IdentifyNewNode(nodes []v1.Node, instanceGroup string) (*v1.Node, error) {
 	watcher, err := c.clientset.CoreV1().Nodes().Watch(metav1.ListOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create Pod status listener")
@@ -102,18 +101,8 @@ func (c *Client) IdentifyNewNode(nodes []v1.Node, role, label string) (*v1.Node,
 		if e.Type == "ADDED" {
 			if !Contains(nodes, n) {
 				// Verify that the new node is of the correct type
-				if n.Labels["kubernetes.io/role"] == role {
-					// Verify that the new node has the correct set of labels
-					if label != "" {
-						labelSlice := strings.Split(label, "=")
-						if n.Labels[labelSlice[0]] == labelSlice[1] {
-							// return the node if role and label set matches
-							return n, nil
-						}
-					} else {
-						// return the node if the role is correct and no labels provided
-						return n, nil
-					}
+				if n.Labels["kops.k8s.io/instancegroup"] == instanceGroup {
+					return n, nil
 				} else {
 					// continue if the new node does match role or labels
 					continue

@@ -12,18 +12,16 @@ import (
 )
 
 //Run: executes the drain command
-func Pods(kubectl *kubernetes.Client, label string, namespace string, gracePeriod time.Duration) error {
-	// Output the banner
-	ui.PrintBanner("dextre")
+func Pods(kubectl *kubernetes.Client, label string, namespace string, gracePeriod time.Duration, verbose bool) error {
 
 	pods, err := kubectl.GetPodsWithLabel(label, namespace)
 	if err != nil {
 		return err
 	}
 
-	ui.PrintPodList(pods.Items, "Pods to be restarted", false)
+	ui.PrintPodList(pods.Items, "Pods to be restarted", false, verbose)
 
-	fmt.Printf("Are you sure you want to restart the pods? ")
+	fmt.Printf("Are you sure you want to roll the pods? ")
 
 	ok, err := ui.AskForConfirmation()
 	if err != nil {
@@ -37,16 +35,16 @@ func Pods(kubectl *kubernetes.Client, label string, namespace string, gracePerio
 
 	// restartPods
 	fmt.Println("")
-	restartPods(kubectl, pods.Items, gracePeriod)
+	rollPods(kubectl, pods.Items, gracePeriod, verbose)
 
 	fmt.Println("")
-	color.Green("[✓] All pods restarted!\n")
+	color.Green("[✓] All pods rolled!\n")
 
 	return nil
 }
 
-func restartPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration) error {
-	table := ui.NewTable("[-]", "EVICTED", "NEW", "NODE")
+func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration, verbose bool) error {
+	table := ui.NewTable("[-]", "EVICTED", "NEW POD", "NEW NODE", verbose)
 	graceP := int64(gracePeriod.Seconds())
 
 	// Evict regular pods first.

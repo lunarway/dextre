@@ -7,7 +7,7 @@ import (
 	"github.com/CrowdSurge/banner"
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 type Table struct {
@@ -19,20 +19,24 @@ type Table struct {
 	c4Width      int
 	formatString string
 	spinner      *spinner.Spinner
+	verbose      bool
 }
 
 // this is a UI thing as well - struct Table Row Header - add column widtch
 
-func NewTable(c1Title, c2Title, c3Title, c4Title string) Table {
+func NewTable(c1Title, c2Title, c3Title, c4Title string, verbose bool) Table {
 	table := Table{
 		c1Width: 4,
 		c2Width: 45,
 		c3Width: 45,
 		c4Width: 50,
 		spinner: spinner.New(spinner.CharSets[9], 100*time.Millisecond),
+		verbose: verbose,
 	}
 	table.formatString = fmt.Sprintf("%%-%ds %%-%ds %%-%ds %%-%ds\n", table.c1Width, table.c2Width, table.c3Width, table.c4Width)
-	fmt.Printf(table.printRow(c1Title, c2Title, c3Title, c4Title))
+	if table.verbose {
+		fmt.Printf(table.printRow(c1Title, c2Title, c3Title, c4Title))
+	}
 	return table
 }
 
@@ -41,16 +45,34 @@ func (t Table) printRow(c1, c2, c3, c4 string) string {
 }
 
 func (t Table) PrepareRow() {
-	t.spinner.Start()
+	if t.verbose {
+		t.spinner.Start()
+	}
 }
 
 func (t Table) DiscardRow() {
-	t.spinner.Stop()
+	if t.verbose {
+		t.spinner.Stop()
+	}
 }
 
 func (t Table) CommitRow(c1, c2, c3, c4 string) {
-	t.spinner.FinalMSG = t.printRow(c1, c2, c3, c4)
-	t.spinner.Stop()
+	if t.verbose {
+		t.spinner.FinalMSG = t.printRow(c1, c2, c3, c4)
+		t.spinner.Stop()
+	}
+}
+
+func PrintTitle(title string, verbose bool) {
+	if verbose {
+		color.Yellow(title)
+	}
+}
+
+func Print(title string, verbose bool) {
+	if verbose {
+		fmt.Println(title)
+	}
 }
 
 func PrintBanner(title string) {
@@ -59,7 +81,10 @@ func PrintBanner(title string) {
 	fmt.Println("")
 }
 
-func PrintPodList(pods []v1.Pod, title string, namespace bool) {
+func PrintPodList(pods []v1.Pod, title string, namespace, verbose bool) {
+	if !verbose {
+		return
+	}
 	color.Yellow(title + "\n")
 	for _, pod := range pods {
 		if namespace {
