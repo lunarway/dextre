@@ -77,9 +77,9 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	ui.Print(fmt.Sprintf("[✓] %d pods evicted!", len(systemPods)+len(regularPods)), true)
 
 	if !nodeTermination {
-		retun nil
+		return nil
 	}
-	
+
 	if !skipValidation {
 		fmt.Println("")
 		fmt.Printf("Do you want to continue and terminate the node? ")
