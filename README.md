@@ -49,6 +49,6 @@ $ dextre roll pods --label app=service --namespace default
 
 #### roll all nodes with a given role and/or label
 ```
-$ dextre roll nodes --role node --label type=some
+$ dextre roll nodes --cluster k8s.prod.example.com --kops-instance-group nodes
 ```
 This command will run the drain command for each node and wait for a new node to be ready before continuing. 
