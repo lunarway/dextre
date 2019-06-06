@@ -76,5 +76,5 @@ func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Durati
 		}
 		table.DiscardRow()
 	}
-	return nil
+	return
 }
