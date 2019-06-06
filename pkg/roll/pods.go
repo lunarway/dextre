@@ -43,7 +43,7 @@ func Pods(kubectl *kubernetes.Client, label string, namespace string, gracePerio
 	return nil
 }
 
-func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration, verbose bool) error {
+func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Duration, verbose bool) {
 	table := ui.NewTable("[-]", "EVICTED", "NEW POD", "NEW NODE", verbose)
 	graceP := int64(gracePeriod.Seconds())
 
@@ -56,15 +56,23 @@ func rollPods(kubectl *kubernetes.Client, pods []v1.Pod, gracePeriod time.Durati
 		table.PrepareRow()
 		err := kubectl.DeletePod(pod, deleteOptions)
 		if err != nil {
-			return err
+			table.CommitRow("[-]", pod.Name, "Delete pod",err.Error())
+			table.DiscardRow()
+			continue
 		}
 		newPod, err := kubectl.DetermineNewPod(pod)
+		if err != nil {
+			table.CommitRow("[-]", pod.Name, "Detemine new pod",err.Error())
+			table.DiscardRow()
+			continue
+		}
 		if newPod != nil {
 			err = kubectl.WaitForPodToBeReady(newPod)
 			if err != nil {
-				return err
+				table.CommitRow("[-]", pod.Name, "Wait for ready pod",err.Error())
+			} else{
+				table.CommitRow("[✓]", pod.Name, newPod.Name, newPod.Spec.NodeName)
 			}
-			table.CommitRow("[✓]", pod.Name, newPod.Name, newPod.Spec.NodeName)
 		}
 		table.DiscardRow()
 	}
