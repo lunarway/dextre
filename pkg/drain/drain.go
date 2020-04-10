@@ -12,7 +12,7 @@ import (
 )
 
 //Run: executes the drain command
-func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation, nodeTermination, verbose bool) error {
+func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration, skipValidation, nodeTermination bool, awsRegion string, verbose bool) error {
 
 	// Find the node in the cluster
 	node, err := kubectl.GetNode(nodeName)
@@ -98,7 +98,7 @@ func Run(kubectl *kubernetes.Client, nodeName string, gracePeriod time.Duration,
 	ui.PrintTitle("Node termination:\n", verbose)
 
 	// Create the client
-	client, err := dextreaws.NewClient("eu-west-1")
+	client, err := dextreaws.NewClient(awsRegion)
 
 	if err != nil {
 		return err
