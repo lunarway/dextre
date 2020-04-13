@@ -45,7 +45,7 @@ func Nodes(kubectl *kubernetes.Client, instanceGroup, cluster string, awsRegion 
 	ui.PrintTitle("PROGRESS:\n", true)
 
 	// Create AWS client
-	client, err := dextreaws.NewClient("eu-west-1")
+	client, err := dextreaws.NewClient(awsRegion)
 	if err != nil {
 		return err
 	}
