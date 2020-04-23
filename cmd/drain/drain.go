@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	nodeName       string
-	gracePeriod    time.Duration
-	skipValidation bool
-	nodeTermination	 bool
+	nodeName        string
+	gracePeriod     time.Duration
+	skipValidation  bool
+	nodeTermination bool
+	awsRegion       string
 )
 
 // NewCommand sets up the move command
@@ -22,7 +23,7 @@ func NewCommand(kubectl *kubernetes.Client, verbose *bool) *cobra.Command {
 		Short: "",
 		Long:  "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return drain.Run(kubectl, nodeName, gracePeriod, skipValidation, nodeTermination, *verbose)
+			return drain.Run(kubectl, nodeName, gracePeriod, skipValidation, nodeTermination, awsRegion, *verbose)
 		},
 	}
 	c.Flags().StringVar(&nodeName, "node", "", "The node that dextre should drain in a safe manner (required)")
@@ -30,6 +31,7 @@ func NewCommand(kubectl *kubernetes.Client, verbose *bool) *cobra.Command {
 	c.Flags().BoolVar(&skipValidation, "skip-validation", false, "Don't ask for validations")
 	c.Flags().BoolVar(&nodeTermination, "terminate-node", false, "Terminate the AWS instance in the autoscaling group")
 	c.Flags().DurationVar(&gracePeriod, "grace-period", (30 * time.Second), "pod grace-period")
+	c.Flags().StringVar(&awsRegion, "aws-region", "us-west-1", "The region to use for node")
 
 	return c
 }
