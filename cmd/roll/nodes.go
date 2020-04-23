@@ -24,7 +24,7 @@ func nodesCommand(kubectl *kubernetes.Client, verbose *bool) *cobra.Command {
 	c.MarkFlagRequired("kops-instance-group")
 	c.Flags().StringVar(&label, "label", "", "label of the nodes to be rolled")
 	c.Flags().StringVar(&cluster, "cluster", "", "the name of the kops cluster")
-	c.Flags().StringVar(&awsRegion, "aws-region", "us-west-1", "the region to use")
+	c.Flags().StringVar(&awsRegion, "aws-region", "ue-west-1", "the region to use")
 	c.MarkFlagRequired("cluster")
 
 	return c
