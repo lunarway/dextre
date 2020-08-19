@@ -3,6 +3,10 @@
 [![Build Status](https://travis-ci.com/lunarway/dextre.svg?branch=master)](https://travis-ci.com/lunarway/dextre)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lunarway/dextre)](https://goreportcard.com/report/github.com/lunarway/dextre)
 
+# Deprecation warning
+
+This project is no longer maintained as kops have added [rolling update strategies](https://github.com/kubernetes/kops/blob/master/docs/operations/rolling-update.md#configurable-rolling-update-strategies) that supports creating new nodes before removing old ones.
+
 ## Table of contents
 - [What is dextre?](#what-is-dextre)
 - [Why did we build dextre?](#why-did-we-build-dextre)
